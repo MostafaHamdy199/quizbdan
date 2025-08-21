@@ -59,8 +59,12 @@
       color: #fff;
       border-color: var(--brand-dark);
     }
-    button {
+    .buttons {
+      display: flex;
+      justify-content: space-between;
       margin-top: 12px;
+    }
+    button {
       padding: 10px 20px;
       border: none;
       border-radius: 8px;
@@ -70,6 +74,10 @@
       cursor: pointer;
     }
     button:hover { background: var(--brand-dark); }
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
@@ -80,30 +88,33 @@
     <div class="progress" id="progress"></div>
     <h2 id="question">ما هدفك من استخدام الموقع؟</h2>
     <div id="answers"></div>
-    <button id="nextBtn" onclick="nextQuestion()">التالي</button>
+    <div class="buttons">
+      <button id="prevBtn" onclick="prevQuestion()">السابق</button>
+      <button id="nextBtn" onclick="nextQuestion()">التالي</button>
+    </div>
   </div>
 
   <script>
     // 5 أسئلة بحسب المطلوب
     const questions = [
       {
-        q: "هل لو حد قالك نكتة بضان بتضحك عليها ولا بتتبضن ومبتضحكش ولا بتقول للي قالها انت بضان بس بتضحك؟",
-        a: ["بضحك", "بتتبضن ومبتضحكش", "بقوله انت بضان وبضحك"],
+        q: " لو حد قالك نكتة بضان ",
+        a: ["بتضحك", "بتتبضن ومبتضحكش", "بتقوله انت بضان وبتضحك"],
       },
       {
-        q: "هل لو حد قفشك من بضانك بتتبضن اوي ولا ببضن فشخ ولا عادي؟",
+        q: " لو حد قفشك من بضانك ",
         a: ["بتتبضن أوي", "ببضن فشخ", "عادي"],
       },
       {
-        q: "هل لو حد شاف بضان داتورا هينبهر من كبرهم ولا هينبهر من سوادهم ولا هيجيب مسامير ويفقعهم؟",
+        q: " لو حد شاف بضان داتورا ",
         a: ["هينبهر من كبرهم", "هينبهر من سوادهم", "هيجيب مسامير ويفقعهم"],
       },
       {
-        q: "هل بضان داتورا اكبر ولا بضان تنين مجنح ولا بضان سنو وهو بيتكلم عن الفيك فيوز؟",
+        q: "مين بضانه اكبر",
         a: ["بضان داتورا", "بضان تنين مجنح", "بضان سنو وهو بيتكلم عن الفيك فيوز"],
       },
       {
-        q: "بتحب ايه اكتر في لحمة العيد المخاصي ولا الكبدة ولا بضان داتورا؟",
+        q: " بتحب ايه اكتر في لحمة العيد ",
         a: ["المخاصي", "الكبدة", "بضان داتورا"],
       },
     ];
@@ -115,9 +126,12 @@
       document.getElementById("question").innerText = questions[current].q;
       document.getElementById("progress").innerText = `السؤال ${current + 1} من ${questions.length}`;
       const optionsHTML = questions[current].a
-        .map((ans) => `<div class="option" onclick="selectAnswer(this, '${ans.replace(/'/g, "&#39;")}')">${ans}</div>`) // تأمين علامات الاقتباس
+        .map((ans) => `<div class="option ${answers[current] === ans ? 'selected' : ''}" onclick="selectAnswer(this, '${ans.replace(/'/g, "&#39;")}')">${ans}</div>`)
         .join("");
       document.getElementById("answers").innerHTML = optionsHTML;
+
+      document.getElementById("prevBtn").disabled = current === 0;
+      document.getElementById("nextBtn").innerText = current === questions.length - 1 ? "إنهاء" : "التالي";
     }
 
     function selectAnswer(element, ans) {
@@ -127,17 +141,14 @@
     }
 
     function nextQuestion() {
-      // لو المستخدم ما اختارش إجابة
       if (!answers[current]) {
-        alert("اختار إجابة الأول");
+        alert("لازم تجاوب قبل ما تكمل");
         return;
       }
-
       if (current < questions.length - 1) {
         current++;
         showQuestion();
       } else {
-        // النتيجة
         document.querySelector(".container").innerHTML = `
           <h2>النتيجة:</h2>
           <p>بناءً على إجاباتك (${answers.join(" - ")}), النتيجة هي:</p>
@@ -146,6 +157,13 @@
                alt="نتيجة" 
                style="margin-top:15px; max-width:100%; border-radius:10px;" />
         `;
+      }
+    }
+
+    function prevQuestion() {
+      if (current > 0) {
+        current--;
+        showQuestion();
       }
     }
 
