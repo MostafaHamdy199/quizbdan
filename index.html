@@ -1,24 +1,48 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <title>اختبار بسيط</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>اختبار البضان</title>
   <style>
+    :root { --brand:#2563eb; --brand-dark:#1d4ed8; }
+    * { box-sizing: border-box; }
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
       background: #f3f4f6;
+      min-height: 100vh;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      direction: rtl; /* لأن المحتوى عربي */
+    }
+    h1.title {
+      margin: 0 0 16px;
+      font-size: 28px;
+      color: #111827;
+      text-align: center;
     }
     .container {
-      background: white;
+      background: #fff;
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      width: 350px;
-      text-align: center;
+      width: 360px;
+      text-align: right;
+    }
+    #question {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 18px;
+      color: #111827;
+      line-height: 1.6;
+    }
+    .progress {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 8px;
     }
     .option {
       padding: 12px;
@@ -26,89 +50,107 @@
       border: 2px solid #ddd;
       border-radius: 8px;
       cursor: pointer;
-      transition: 0.3s;
+      transition: 0.2s ease;
+      user-select: none;
     }
-    .option:hover {
-      border-color: #2563eb;
-    }
+    .option:hover { border-color: var(--brand); }
     .selected {
-      background: #2563eb;
-      color: white;
-      border-color: #1d4ed8;
+      background: var(--brand);
+      color: #fff;
+      border-color: var(--brand-dark);
     }
     button {
-      margin-top: 15px;
+      margin-top: 12px;
       padding: 10px 20px;
       border: none;
       border-radius: 8px;
-      background: #2563eb;
+      background: var(--brand);
       color: white;
       font-size: 16px;
       cursor: pointer;
     }
-    button:hover {
-      background: #1d4ed8;
-    }
+    button:hover { background: var(--brand-dark); }
   </style>
 </head>
 <body>
+  <!-- العنوان المطلوب فوق المربع -->
+  <h1 class="title">اختبار البضان</h1>
+
   <div class="container">
+    <div class="progress" id="progress"></div>
     <h2 id="question">ما هدفك من استخدام الموقع؟</h2>
     <div id="answers"></div>
-    <button onclick="nextQuestion()">التالي</button>
+    <button id="nextBtn" onclick="nextQuestion()">التالي</button>
   </div>
 
   <script>
+    // 5 أسئلة بحسب المطلوب
     const questions = [
       {
-        q: "ما هدفك من الموقع؟",
-        a: ["تعلم", "تسلية", "شغل"]
+        q: "هل لو حد قالك نكتة بضان بتضحك عليها ولا بتتبضن ومبتضحكش ولا بتقول للي قالها انت بضان بس بتضحك؟",
+        a: ["بضحك", "بتتبضن ومبتضحكش", "بقوله انت بضان وبضحك"],
       },
       {
-        q: "كم خبرتك في المجال؟",
-        a: ["مبتدئ", "متوسط", "خبير"]
+        q: "هل لو حد قفشك من بضانك بتتبضن اوي ولا ببضن فشخ ولا عادي؟",
+        a: ["بتتبضن أوي", "ببضن فشخ", "عادي"],
       },
       {
-        q: "ما نوع النتيجة التي تفضلها؟",
-        a: ["نصيحة", "خطة", "ملخص"]
-      }
+        q: "هل لو حد شاف بضان داتورا هينبهر من كبرهم ولا هينبهر من سوادهم ولا هيجيب مسامير ويفقعهم؟",
+        a: ["هينبهر من كبرهم", "هينبهر من سوادهم", "هيجيب مسامير ويفقعهم"],
+      },
+      {
+        q: "هل بضان داتورا اكبر ولا بضان تنين مجنح ولا بضان سنو وهو بيتكلم عن الفيك فيوز؟",
+        a: ["بضان داتورا", "بضان تنين مجنح", "بضان سنو وهو بيتكلم عن الفيك فيوز"],
+      },
+      {
+        q: "بتحب ايه اكتر في لحمة العيد المخاصي ولا الكبدة ولا بضان داتورا؟",
+        a: ["المخاصي", "الكبدة", "بضان داتورا"],
+      },
     ];
 
     let current = 0;
-    let answers = [];
+    const answers = new Array(questions.length);
 
     function showQuestion() {
       document.getElementById("question").innerText = questions[current].q;
-      let optionsHTML = questions[current].a.map(
-        ans => `<div class="option" onclick="selectAnswer(this, '${ans}')">${ans}</div>`
-      ).join("");
+      document.getElementById("progress").innerText = `السؤال ${current + 1} من ${questions.length}`;
+      const optionsHTML = questions[current].a
+        .map((ans) => `<div class="option" onclick="selectAnswer(this, '${ans.replace(/'/g, "&#39;")}')">${ans}</div>`) // تأمين علامات الاقتباس
+        .join("");
       document.getElementById("answers").innerHTML = optionsHTML;
     }
 
     function selectAnswer(element, ans) {
-      document.querySelectorAll(".option").forEach(opt => opt.classList.remove("selected"));
+      document.querySelectorAll(".option").forEach((opt) => opt.classList.remove("selected"));
       element.classList.add("selected");
       answers[current] = ans;
     }
 
     function nextQuestion() {
+      // لو المستخدم ما اختارش إجابة
+      if (!answers[current]) {
+        alert("اختار إجابة الأول");
+        return;
+      }
+
       if (current < questions.length - 1) {
         current++;
         showQuestion();
       } else {
+        // النتيجة
         document.querySelector(".container").innerHTML = `
           <h2>النتيجة:</h2>
           <p>بناءً على إجاباتك (${answers.join(" - ")}), النتيجة هي:</p>
-          <h3>✅ أنت شخص مناسب للتعلم عبر الإنترنت!</h3>
-          <img src="https://github.com/MostafaHamdy199/quizbdan/blob/main/WhatsApp%20Image%202025-08-21%20at%206.44.55%20AM.jpeg?raw=true" 
+          <h3>انت بضان نييييييييييك</h3>
+          <img src="https://github.com/MostafaHamdy199/quizbdan/blob/main/WhatsApp%20Image%202025-08-21%20at%206.44.55%20AM.jpeg?raw=true"
                alt="نتيجة" 
-               style="margin-top:15px; max-width:100%; border-radius:10px;">
+               style="margin-top:15px; max-width:100%; border-radius:10px;" />
         `;
       }
     }
 
+    // أول عرض
     showQuestion();
   </script>
 </body>
 </html>
-
