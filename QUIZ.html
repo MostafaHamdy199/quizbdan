@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>اختبار بسيط</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 350px;
+      text-align: center;
+    }
+    .option {
+      padding: 12px;
+      margin: 8px 0;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .option:hover {
+      border-color: #2563eb;
+    }
+    .selected {
+      background: #2563eb;
+      color: white;
+      border-color: #1d4ed8;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 id="question">ما هدفك من استخدام الموقع؟</h2>
+    <div id="answers"></div>
+    <button onclick="nextQuestion()">التالي</button>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        q: "ما هدفك من الموقع؟",
+        a: ["تعلم", "تسلية", "شغل"]
+      },
+      {
+        q: "كم خبرتك في المجال؟",
+        a: ["مبتدئ", "متوسط", "خبير"]
+      },
+      {
+        q: "ما نوع النتيجة التي تفضلها؟",
+        a: ["نصيحة", "خطة", "ملخص"]
+      }
+    ];
+
+    let current = 0;
+    let answers = [];
+
+    function showQuestion() {
+      document.getElementById("question").innerText = questions[current].q;
+      let optionsHTML = questions[current].a.map(
+        ans => `<div class="option" onclick="selectAnswer(this, '${ans}')">${ans}</div>`
+      ).join("");
+      document.getElementById("answers").innerHTML = optionsHTML;
+    }
+
+    function selectAnswer(element, ans) {
+      document.querySelectorAll(".option").forEach(opt => opt.classList.remove("selected"));
+      element.classList.add("selected");
+      answers[current] = ans;
+    }
+
+    function nextQuestion() {
+      if (current < questions.length - 1) {
+        current++;
+        showQuestion();
+      } else {
+        document.querySelector(".container").innerHTML = `
+          <h2>النتيجة:</h2>
+          <p>بناءً على إجاباتك (${answers.join(" - ")}), النتيجة هي:</p>
+          <h3>✅ أنت شخص مناسب للتعلم عبر الإنترنت!</h3>
+          <img src="https://i.postimg.cc/Gm6rDPcJ/photo-2025-08-21-09-29-18.jpg" 
+               alt="نتيجة" 
+               style="margin-top:15px; max-width:100%; border-radius:10px;">
+        `;
+      }
+    }
+
+    showQuestion();
+  </script>
+</body>
+</html>
